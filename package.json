@@ -1,0 +1,20 @@
+{
+  "name": "timeliner",
+  "version": "0.0.1",
+  "description": "HTTP performance measuring tool",
+  "main": "timeline.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hgcummings/timeliner.git"
+  },
+  "author": "hgcummings",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/hgcummings/timeliner/issues"
+  },
+  "homepage": "https://github.com/hgcummings/timeliner",
+  "dependencies": {
+    "q": "^1.0.1",
+    "q-io": "^1.11.5"
+  }
+}
