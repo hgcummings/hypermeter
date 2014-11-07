@@ -2,6 +2,7 @@
     "urls": [
         "https://www.google.com",
         "http://httpbin.org/status/500",
-        "https://twitter.com"
+        "https://twitter.com",
+        "malformed:url"
     ]
 }
