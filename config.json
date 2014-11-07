@@ -1,3 +1,7 @@
 {
-  "urls": ["http://www.google.com", "http://www.twitter.com"]
+    "urls": [
+        "https://www.google.com",
+        "http://httpbin.org/status/500",
+        "https://twitter.com"
+    ]
 }

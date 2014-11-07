@@ -6,9 +6,10 @@ var HTTP = require("q-io/http");
 var requests = [];
 config.urls.forEach(function(url) {
     var start = process.hrtime();
-    requests.push(HTTP.request(url).then(function() {
+    requests.push(HTTP.request(url).then(function(response) {
         var diff = process.hrtime(start);
-        console.log(url + ' took %d milliseconds', diff[0] * 1e3 + diff[1] / 1e6);
+        console.log(url + ' returned %s, took %d milliseconds',
+            response.status, diff[0] * 1e3 + Math.round(diff[1] / 1e6));
     }));
 });
 
