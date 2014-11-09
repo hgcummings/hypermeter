@@ -1,8 +1,14 @@
 {
+    "plot": {
+      "filename": "timeline_test",
+      "id": 9
+    },
     "urls": [
         "https://www.google.com",
         "http://httpbin.org/status/500",
         "https://twitter.com",
-        "malformed:url"
+        "malformed:url",
+        "https://www.facebook.com",
+        "http://www.bbc.co.uk/news/"
     ]
 }

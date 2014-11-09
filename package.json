@@ -14,7 +14,11 @@
   },
   "homepage": "https://github.com/hgcummings/timeliner",
   "dependencies": {
+    "commander": "^2.5.0",
     "q": "^1.0.1",
     "q-io": "^1.11.5"
+  },
+  "devDependencies": {
+    "plotly": "^0.2.13"
   }
 }
