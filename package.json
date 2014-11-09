@@ -1,0 +1,26 @@
+{
+  "name": "hypermeter",
+  "version": "0.0.1",
+  "description": "HTTP metric tool",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hgcummings/hypermeter.git"
+  },
+  "author": "hgcummings",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/hgcummings/hypermeter/issues"
+  },
+  "homepage": "https://github.com/hgcummings/hypermeter",
+  "dependencies": {
+    "q": "^1.0.1",
+    "q-io": "^1.11.5"
+  }
+}
