@@ -22,5 +22,8 @@
   "dependencies": {
     "q": "^1.0.1",
     "q-io": "^1.11.5"
+  },
+  "devDependencies": {
+    "mocha": "^2.0.1"
   }
 }
