@@ -32,6 +32,9 @@ describe('config', function() {
         .then(function(exitCode) {
             assert.equal(0, exitCode);
             assert.equal(3, visitedUrls.length);
+            assert.notEqual(-1, visitedUrls.indexOf('/one'));
+            assert.notEqual(-1, visitedUrls.indexOf('/two'));
+            assert.notEqual(-1, visitedUrls.indexOf('/three'));
             done();
         });
     });

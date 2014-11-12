@@ -3,13 +3,12 @@ var helpers = require('./helpers.js');
 var given = require('./builder.js').given;
 
 describe('returnCode', function() {
-    var responseCode = 200;
     var server;
     var configFilename;
 
     before(function(done) {
         server = helpers.startServer(function(req, res) {
-            res.statusCode = responseCode;
+            res.statusCode = req.url.substring(1, 4);
             res.end();
         }, done);
     });
@@ -19,8 +18,7 @@ describe('returnCode', function() {
     });
 
     it('should be 0 if only URL returns good responses', function(done) {
-        responseCode = 200;
-        given().aConfigFile().withUrl('http://localhost:55557/')
+        given().aConfigFile().withUrl('http://localhost:55557/200')
         .when().iRunTheApplication()
         .then(function(exitCode) {
             assert.equal(0, exitCode);
@@ -29,11 +27,34 @@ describe('returnCode', function() {
     });
 
     it('should be 1 if only URL returns a bad response', function(done) {
-        responseCode = 500;
-        given().aConfigFile().withUrl('http://localhost:55557/')
+        given().aConfigFile().withUrl('http://localhost:55557/500')
         .when().iRunTheApplication()
         .then(function(exitCode) {
             assert.equal(1, exitCode);
+            done();
+        });
+    });
+
+    it('should be 0 if all URLs return good responses', function(done) {
+        given().aConfigFile()
+            .withUrl('http://localhost:55557/200')
+            .withUrl('http://localhost:55557/204')
+        .when().iRunTheApplication()
+        .then(function(exitCode) {
+            assert.equal(0, exitCode);
+            done();
+        });
+    });
+
+    it('should be the number of failures if some URLs fail', function(done) {
+        given()
+            .aConfigFile()
+                .withUrl('http://localhost:55557/200')
+                .withUrl('http://localhost:55557/500')
+                .withUrl('http://localhost:55557/501')
+        .when().iRunTheApplication()
+        .then(function(exitCode) {
+            assert.equal(2, exitCode);
             done();
         });
     });

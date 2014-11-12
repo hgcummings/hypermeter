@@ -6,19 +6,15 @@ var Q = require('q');
 var HTTP = require("q-io/http");
 
 var requests = [];
-var failed = false;
+var failedUrls = [];
 config.urls.forEach(function(url) {
-    requests.push(HTTP.request(config.urls[0]).then(function(response) {
+    requests.push(HTTP.request(url).then(function(response) {
         if(parseInt(response.status) >= 400) {
-            failed = true;
+            failedUrls.push(url);
         }
     }));
 });
 
 Q.all(requests).then(function() {
-    if (failed) {
-        process.exit(1);
-    } else {
-        process.exit(0);
-    }
+    process.exit(failedUrls.length);
 });
