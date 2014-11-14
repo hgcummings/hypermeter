@@ -37,16 +37,23 @@ var actBuilder = function(configFilename, arrangeBuilder) {
 
     var runApplication = function(callback) {
         var child = child_process.spawn('node', ['index.js', configFilename]);
+        var output = '';
         child.stdout.on('data', function (data) {
-            console.log('stdout: ' + data);
+            output += data.toString();
         });
 
         child.stderr.on('data', function (data) {
             console.log('stderr: ' + data);
         });
+
         child.on('close', function(exitCode) {
+            var remainingOutput = child.stdout.read();
+            if (remainingOutput) {
+                output += remainingOutput;
+            }
+
             fs.unlink(configFilename, function() {
-                callback(exitCode);
+                callback(exitCode, output);
             });
         });
     }
