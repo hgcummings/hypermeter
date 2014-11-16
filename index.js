@@ -6,7 +6,7 @@ var client = require('./client.js');
 var runner = require('./runner.js');
 var checker = require('./checker.js').init();
 
-runner.run(client, config.urls, defaultReporter, checker)
+runner.run(client.init(config.client), config.urls, defaultReporter, checker)
     .then(function(failedUrls) {
         exit(failedUrls.length);
     }

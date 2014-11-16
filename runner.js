@@ -9,6 +9,8 @@ exports.run = function(client, urls, reporter, checker) {
             var time = process.hrtime(start);
             reporter.report(url, response, time);
             checker.check(url, response);
+        }, function(error) {
+           console.log(error);
         }));
     });
 
