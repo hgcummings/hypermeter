@@ -6,6 +6,11 @@ exports.create = function(reporters) {
                 allReporters.forEach(function(reporter) {
                     reporter.report(url, response, time);
                 });
+            },
+            summarise: function(passes, failures) {
+                allReporters.forEach(function(reporter) {
+                    reporter.summarise(passes, failures);
+                });
             }
         }
     } else {

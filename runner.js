@@ -15,6 +15,7 @@ exports.run = function(client, urls, reporter, checker) {
     });
 
     return Q.all(requests).then(function() {
+        reporter.summarise(checker.passes, checker.failures);
         return checker.failures;
     });
 };
