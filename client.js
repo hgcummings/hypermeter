@@ -3,7 +3,7 @@ var curl = require('curlrequest');
 var Q = require('q');
 var HTTP = require('q-io/http');
 
-exports.init = function(config) {
+exports.create = function(config) {
     var self = {};
 
     self.request = function(url) {

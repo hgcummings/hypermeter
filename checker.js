@@ -1,4 +1,4 @@
-exports.init = function() {
+exports.create = function() {
     var self = {};
 
     self.failures = [];
