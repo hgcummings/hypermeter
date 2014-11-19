@@ -10,7 +10,7 @@ runner.run(
         client.create(config.client),
         config.urls,
         reporters.create(config.reporters),
-        checker.create())
+        checker.create(config.checker))
     .then(function(failedUrls) {
         exit(failedUrls.length);
     }

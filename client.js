@@ -9,13 +9,18 @@ exports.create = function(config) {
     self.request = function(url) {
         if (config) {
             var options = {
-                url: url
+                url: url,
+                'write-out': '%{http_code}'
             }
             extend(options, config);
-            return Q.nfcall(curl.request, options);
+            return Q.nfcall(curl.request, options).then(function(curlOutput) {
+                return {
+                    status: curlOutput[0].split('\n').pop()
+                }
+            });
         }
 
-        return HTTP.request(url);
+        return HTTP.request(url).then(function(response) { return response; });
     };
 
     return self;

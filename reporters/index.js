@@ -1,6 +1,13 @@
 exports.create = function(reporters) {
     if (reporters) {
-        var allReporters = reporters.map(function(name) { return require('./' + name + '.js'); });
+        var allReporters = [];
+        for (var reporter in reporters) {
+            if (reporters.hasOwnProperty(reporter)) {
+                allReporters.push(require('./' + reporter + '.js')
+                    .create(reporters[reporter]));
+            };
+        }
+
         return {
             report: function(url, response, time) {
                 allReporters.forEach(function(reporter) {
@@ -14,6 +21,6 @@ exports.create = function(reporters) {
             }
         }
     } else {
-        return require('./console.js');
+        return require('./console.js').create();
     }
 }

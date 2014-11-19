@@ -14,13 +14,33 @@ describe('reporter factory', function() {
 
         var factory = proxyquire('../reporters', {
             './stubReporter.js': {
-                report: function() { called = true; },
+                create: function() { return {
+                    report: function() { called = true; },
+                }},
                 '@noCallThru': true
             }
         });
-        var reporter = factory.create(['stubReporter']);
+        var reporter = factory.create({ stubReporter: {} });
 
         reporter.report();
         assert(called);
+    });
+
+    it('passes config to the specified reporters', function() {
+        var actualConfig = null;
+
+        var factory = proxyquire('../reporters', {
+            './stubReporter.js': {
+                create: function(config) { actualConfig = config; },
+                '@noCallThru': true
+            }
+        });
+        var reporter = factory.create({
+            stubReporter: {
+                foo: 'bar'
+            }
+        });
+
+        assert.equal(actualConfig.foo, 'bar');
     });
 });
