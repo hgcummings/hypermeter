@@ -1,8 +1,7 @@
 exports.create = function() {
     return {
         report: function(url, response, time) {
-          var millis = time[0] * 1e3 + Math.round(time[1] / 1e6);
-          console.log(url + ' returned %s, took %d milliseconds', response.status, millis);
+          console.log(url + ' returned %s, took %d milliseconds', response.status, time);
         },
         summarise: function(passes, failures) {
           if (failures && failures.length) {
