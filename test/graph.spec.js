@@ -39,7 +39,7 @@ describe('graph reporter', function() {
 
         reporter.report(failureUrl, 500, 45, false);
 
-        reporter.summarise([url], [failureUrl], function() {
+        reporter.summarise([url], [failureUrl]).then(function() {
             plotly.getFigure(process.env.PLOTLY_USERNAME, fileId, function(err, figure) {
                 var data = figure.data;
                 assert.equal(figure.data.length, 1);
@@ -47,6 +47,8 @@ describe('graph reporter', function() {
                 assert.equal(figure.data[0].y, time);
                 done();
             });
+        }).fail(function (error) {
+            console.log('Error ' + error);
         });
     });
 
@@ -88,7 +90,7 @@ describe('graph reporter', function() {
 
                     reporter.report(existingData.name, 200, updatedTime, true);
 
-                    reporter.summarise([existingData.url, url], [], function() {
+                    reporter.summarise([existingData.url, url], []).then(function() {
                         plotly.getFigure(process.env.PLOTLY_USERNAME, fileId, function(err, figure) {
                             var data = figure.data;
                             assert.equal(figure.data.length, 2);
@@ -98,7 +100,9 @@ describe('graph reporter', function() {
                             assert.equal(figure.data[1].y, time);
                             done();
                         });
-                    });
+                    }).fail(function (error) {
+                        console.log('Error ' + error);
+                    });;
 
                 }
             });

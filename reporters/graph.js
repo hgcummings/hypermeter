@@ -1,3 +1,5 @@
+var Q = require('q');
+
 var resolve = function resolve(value) {
     if (value && value[0] === '$') {
         return process.env[value.substr(1)];
@@ -43,17 +45,19 @@ exports.create = function(config) {
 
         var plotNewTraces = function() {
             if (newTraces.length) {
+                console.log('Writing new traces...');
                 plotly.plot(newTraces, {
                     layout: layout,
                     filename: filename,
                     fileopt: existingTraces.length ? 'append' : 'overwrite'
-                }, function(err, msg) {
-                    callback(err, msg);
-                });
+                }, callback);
+            } else {
+                callback();
             }
         };
 
         if (updatedTraces.length) {
+            console.log('Writing updated traces...');
             plotly.plot(updatedTraces, {
                 layout: layout,
                 filename: filename,
@@ -83,15 +87,15 @@ exports.create = function(config) {
                 });
             }
         },
-        summarise: function(passes, failures, callback) {
-            if (fileId) {
+        summarise: function(passes, failures) {
+            console.log('Graph summarise...');
+            return Q.promise(function(resolve, reject) {
                 plotly.getFigure(username, fileId, function(err, figure) {
-                    var existingTraces = figure.data.map(function(trace) { return trace.name; });
-                    plot(existingTraces, callback);
+                    console.log('Loaded graph...');
+                    existingTraces = figure.data.map(function(trace) { return trace.name; });
+                    plot(existingTraces, resolve);
                 });
-            } else {
-                plot([], callback);
-            }
+            });
         }
     };
 }

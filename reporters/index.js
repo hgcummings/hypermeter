@@ -9,15 +9,16 @@ exports.create = function(reporters) {
         }
 
         return {
-            report: function(url, response, time) {
+            report: function(url, response, time, success) {
                 allReporters.forEach(function(reporter) {
-                    reporter.report(url, response, time);
+                    reporter.report(url, response, time, success);
                 });
             },
             summarise: function(passes, failures) {
-                allReporters.forEach(function(reporter) {
-                    reporter.summarise(passes, failures);
+                var allSummaries = allReporters.map(function(reporter) {
+                    return reporter.summarise(passes, failures);
                 });
+                return Q.all(allSummaries);
             }
         }
     } else {

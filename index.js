@@ -7,11 +7,10 @@ var checker = require('./checker.js');
 var runner = require('./runner.js');
 
 runner.run(
-        client.create(config.client),
-        config.urls,
-        reporters.create(config.reporters),
-        checker.create(config.checker))
-    .then(function(failedUrls) {
-        exit(failedUrls.length);
-    }
-);
+    client.create(config.client),
+    config.urls,
+    reporters.create(config.reporters),
+    checker.create(config.checker))
+.then(function(failedUrls) {
+    exit(failedUrls.length);
+});

@@ -10,12 +10,13 @@ exports.create = function(config) {
         if (config) {
             var options = {
                 url: url,
-                'write-out': '%{http_code}'
+                'write-out': '#%{http_code}'
             }
             extend(options, config);
             return Q.nfcall(curl.request, options).then(function(curlOutput) {
+                var stdout = curlOutput[0];
                 return {
-                    status: curlOutput[0].split('\n').pop()
+                    status: stdout.substr(stdout.lastIndexOf('#') + 1)
                 }
             });
         }
