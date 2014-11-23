@@ -10,7 +10,7 @@ var runner = require('./runner.js');
 if (process.env.LOG_LEVEL) {
     log.setLevel(process.env.LOG_LEVEL);
 } else {
-    log.setLevel(log.levels.SILENT);
+    log.setLevel(log.levels.ERROR);
 }
 
 runner.run(
@@ -20,4 +20,8 @@ runner.run(
     checker.create(config.checker))
 .then(function(failedUrls) {
     exit(failedUrls.length);
-});
+})
+.fail(function(error) {
+    log.error(error);
+})
+.done();

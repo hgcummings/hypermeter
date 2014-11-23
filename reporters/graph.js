@@ -18,8 +18,9 @@ exports.create = function(config) {
     var dataPoints = [];
 
     var plotly = require('plotly')(username, apiKey);
+    var plot = Q.nbind(plotly.plot, plotly);
 
-    var plot = function(existingTraces, callback) {
+    var plotTraces = function(existingTraces) {
         var updatedTraces = [];
         var updatedTraceKeys = [];
         var newTraces = [];
@@ -47,32 +48,28 @@ exports.create = function(config) {
         var plotNewTraces = function() {
             if (newTraces.length) {
                 log.debug('Writing new traces...');
-                plotly.plot(newTraces, {
+                return plot(newTraces, {
                     layout: layout,
                     filename: filename,
                     fileopt: existingTraces.length ? 'append' : 'overwrite'
-                }, callback);
+                });
             } else {
-                callback();
+                return Q('Done');
             }
         };
 
         if (updatedTraces.length) {
             log.debug('Writing updated traces...');
-            plotly.plot(updatedTraces, {
+            return plot(updatedTraces, {
                 layout: layout,
                 filename: filename,
                 fileopt: 'extend',
                 traces: updatedTraceKeys
-            }, function(err, msg) {
-                if (err) {
-                    callback(err, msg);
-                } else {
-                    plotNewTraces();
-                }
+            }).then(function() {
+                return plotNewTraces();
             });
         } else {
-            plotNewTraces();
+            return plotNewTraces();
         }
     }
 
@@ -90,13 +87,11 @@ exports.create = function(config) {
         },
         summarise: function(passes, failures) {
             log.debug('Graph summarise...');
-            return Q.promise(function(resolve, reject) {
-                plotly.getFigure(username, fileId, function(err, figure) {
-                    log.debug('Loaded graph...');
-                    existingTraces = figure.data.map(function(trace) { return trace.name; });
-                    plot(existingTraces, resolve);
-                });
-            });
+            return Q.ninvoke(plotly, "getFigure", username, fileId)
+            .then(function(figure) {
+                return figure.data.map(function(trace) { return trace.name; });
+            })
+            .then(plotTraces);
         }
     };
 }
