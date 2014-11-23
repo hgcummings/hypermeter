@@ -24,6 +24,7 @@
     "curlrequest": "^0.5.1",
     "exit": "^0.1.2",
     "extend": "^2.0.0",
+    "loglevel": "^1.2.0",
     "plotly": "^0.2.13",
     "proxyquire": "^1.0.1",
     "q": "^1.0.1",

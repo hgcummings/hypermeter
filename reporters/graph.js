@@ -1,4 +1,5 @@
 var Q = require('q');
+var log = require('loglevel');
 
 var resolve = function resolve(value) {
     if (value && value[0] === '$') {
@@ -45,7 +46,7 @@ exports.create = function(config) {
 
         var plotNewTraces = function() {
             if (newTraces.length) {
-                console.log('Writing new traces...');
+                log.debug('Writing new traces...');
                 plotly.plot(newTraces, {
                     layout: layout,
                     filename: filename,
@@ -57,7 +58,7 @@ exports.create = function(config) {
         };
 
         if (updatedTraces.length) {
-            console.log('Writing updated traces...');
+            log.debug('Writing updated traces...');
             plotly.plot(updatedTraces, {
                 layout: layout,
                 filename: filename,
@@ -88,10 +89,10 @@ exports.create = function(config) {
             }
         },
         summarise: function(passes, failures) {
-            console.log('Graph summarise...');
+            log.debug('Graph summarise...');
             return Q.promise(function(resolve, reject) {
                 plotly.getFigure(username, fileId, function(err, figure) {
-                    console.log('Loaded graph...');
+                    log.debug('Loaded graph...');
                     existingTraces = figure.data.map(function(trace) { return trace.name; });
                     plot(existingTraces, resolve);
                 });
