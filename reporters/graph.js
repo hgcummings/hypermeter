@@ -73,6 +73,14 @@ exports.create = function(config) {
         }
     }
 
+    var createEmptyGraph = function() {
+        return plot({}, { filename: filename, fileopt: 'overwrite' })
+        .then(function(response) {
+            log.warn('No fileId specified, created new graph ' + response.url);
+            return plotTraces([]);
+        });
+    }
+
     return {
         report: function(url, response, time, success) {
             if (success) {
@@ -87,11 +95,15 @@ exports.create = function(config) {
         },
         summarise: function(passes, failures) {
             log.debug('Graph summarise...');
-            return Q.ninvoke(plotly, "getFigure", username, fileId)
-            .then(function(figure) {
-                return figure.data.map(function(trace) { return trace.name; });
-            })
-            .then(plotTraces);
+            if (fileId) {
+                return Q.ninvoke(plotly, "getFigure", username, fileId)
+                .then(function(figure) {
+                    return figure.data.map(function(trace) { return trace.name; });
+                })
+                .then(plotTraces);
+            } else {
+                return createEmptyGraph();
+            }
         }
     };
 }

@@ -12,7 +12,7 @@ var runner = require('./runner.js');
 if (process.env.LOG_LEVEL) {
     log.setLevel(process.env.LOG_LEVEL);
 } else {
-    log.setLevel(log.levels.ERROR);
+    log.setLevel(log.levels.WARN);
 }
 
 runner.run(

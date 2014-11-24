@@ -3,6 +3,7 @@ var Q = require('q');
 var plotly = require('plotly')(
     process.env.PLOTLY_USERNAME, process.env.PLOTLY_API_KEY);
 var graphReporter = require('../reporters/graph.js');
+var log = require('loglevel').setLevel('error');
 
 describe('graph reporter', function() {
     this.timeout(10000);
@@ -19,13 +20,43 @@ describe('graph reporter', function() {
             done();
         }).fail(function (error) {
             console.log('Error ' + error);
-        }).done();;
+        }).done();
+    });
+
+    it('creates/overwrites file if none specified', function(done) {
+        var config = {
+            filename: testFilename,
+            username: '$PLOTLY_USERNAME',
+            apiKey: '$PLOTLY_API_KEY',
+            build: 4
+        };
+        reporter = graphReporter.create(config);
+
+        var url = 'http://test.example.com/';
+        var response = 200;
+        var time = 123;
+        var success = true;
+        reporter.report(url, response, time, success);
+
+        reporter.summarise([url], [])
+        .then(function() {
+            return Q.ninvoke(plotly, 'getFigure', process.env.PLOTLY_USERNAME, fileId);
+        })
+        .then(function(figure) {
+            var data = figure.data;
+            assert.equal(figure.data.length, 1);
+            assert.equal(figure.data[0].x, config.build);
+            assert.equal(figure.data[0].y, time);
+            done();
+        }).fail(function (error) {
+            console.log('Error ' + error);
+        }).done();
     });
 
     it('creates plots for successful URLs', function(done) {
         var config = {
             filename: testFilename,
-            username: process.env.PLOTLY_USERNAME,
+            username: '$PLOTLY_USERNAME',
             apiKey: '$PLOTLY_API_KEY',
             build: 4,
             fileId: fileId
@@ -42,14 +73,16 @@ describe('graph reporter', function() {
 
         reporter.report(failureUrl, 500, 45, false);
 
-        reporter.summarise([url], [failureUrl]).then(function() {
-            plotly.getFigure(process.env.PLOTLY_USERNAME, fileId, function(err, figure) {
-                var data = figure.data;
-                assert.equal(figure.data.length, 1);
-                assert.equal(figure.data[0].x, config.build);
-                assert.equal(figure.data[0].y, time);
-                done();
-            });
+        reporter.summarise([url], [failureUrl])
+        .then(function() {
+            return Q.ninvoke(plotly, 'getFigure', process.env.PLOTLY_USERNAME, fileId);
+        })
+        .then(function(figure) {
+            var data = figure.data;
+            assert.equal(figure.data.length, 1);
+            assert.equal(figure.data[0].x, config.build);
+            assert.equal(figure.data[0].y, time);
+            done();
         }).fail(function (error) {
             console.log('Error ' + error);
         }).done();
@@ -59,7 +92,7 @@ describe('graph reporter', function() {
     it('extends an existing graph with new data', function(done) {
         var config = {
             filename: testFilename,
-            username: process.env.PLOTLY_USERNAME,
+            username: '$PLOTLY_USERNAME',
             apiKey: '$PLOTLY_API_KEY',
             build: 4,
             fileId: fileId
