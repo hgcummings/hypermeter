@@ -1,8 +1,11 @@
 {
   "name": "hypermeter",
-  "version": "0.0.1",
+  "version": "0.0.3",
   "description": "HTTP metric tool",
-  "main": "index.js",
+  "preferGlobal": "true",
+  "bin": {
+    "hypermeter": "./index.js"
+  },
   "directories": {
     "test": "test"
   },

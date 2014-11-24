@@ -1,3 +1,5 @@
+#! /usr/bin/env node
+
 var fs = require('fs');
 var exit = require('exit');
 var log = require('loglevel');
