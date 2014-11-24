@@ -1,3 +1,5 @@
+var Q = require('q');
+
 exports.create = function(reporters) {
     if (reporters) {
         var allReporters = [];
