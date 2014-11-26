@@ -23,6 +23,7 @@
   },
   "homepage": "https://github.com/hgcummings/hypermeter",
   "dependencies": {
+    "chai": "^1.10.0",
     "commander": "^2.5.0",
     "curlrequest": "^0.5.1",
     "exit": "^0.1.2",

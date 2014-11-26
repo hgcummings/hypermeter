@@ -1,8 +1,19 @@
 var assert = require('assert');
 var helpers = require('./helpers.js');
 var given = require('./builder.js').given;
+var when = require('./builder.js').when;
+var expect = require('chai').expect;
 
 describe('command line interface', function() {
+    it('should request a config file if none specified', function(done) {
+        when().iRunTheApplication()
+        .then(function(exitCode, output, errorOutput) {
+            expect(exitCode).to.equal(1);
+            expect(errorOutput).to.contain('specify a config file');
+            done();
+        });
+    });
+
     describe('returnCode', function() {
         var server;
         var configFilename;

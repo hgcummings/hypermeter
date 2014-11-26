@@ -28,9 +28,8 @@ var configFileBuilder = function(actBuilder) {
         return actBuilder(self.build(), cleanup);
     }
 
-    self.then = function(verify, done) {
-        verify(self.build());
-        cleanup(done);
+    self.then = function(verify) {
+        verify(self.build()).then(cleanup).done();
     };
 
     var cleanup = function(callback) {
@@ -52,14 +51,20 @@ var actBuilder = function(configFilename, configCleanup) {
     }
 
     var runApplication = function(callback) {
-        var child = child_process.spawn('node', ['index.js', configFilename]);
+        var args = ['index.js'];
+        if (configFilename) {
+            args.push(configFilename);
+        }
+
+        var child = child_process.spawn('node', args);
         var output = '';
+        var errorOutput = '';
         child.stdout.on('data', function (data) {
             output += data.toString();
         });
 
         child.stderr.on('data', function (data) {
-            console.log('stderr: ' + data);
+            errorOutput += data;
         });
 
         child.on('close', function(exitCode) {
@@ -68,9 +73,13 @@ var actBuilder = function(configFilename, configCleanup) {
                 output += remainingOutput;
             }
 
-            configCleanup(function() {
-                callback(exitCode, output);
-            });
+            if (configCleanup) {
+                configCleanup(function() {
+                    callback(exitCode, output, errorOutput);
+                });
+            } else {
+                callback(exitCode, output, errorOutput);
+            }
         });
     }
 
@@ -84,3 +93,5 @@ module.exports.given = function() {
         }
     }
 };
+
+module.exports.when = actBuilder;

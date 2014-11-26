@@ -1,4 +1,5 @@
 var fs = require('fs');
+var Q = require('q');
 
 var resolve = function resolve(value) {
     var recur = function(node, resolvedNode) {
@@ -20,6 +21,12 @@ var resolve = function resolve(value) {
 }
 
 module.exports.load = function(path) {
-    var loaded = require(fs.realpathSync(path));
-    return resolve(loaded);
+    if (!path) {
+        return Q.reject('Please specify a config file, e.g. `hypermeter my-config.json`');
+    }
+
+    return Q.nfcall(fs.realpath, path)
+    .then(function(realpath) {
+        return resolve(require(realpath));
+    });
 }
