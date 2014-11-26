@@ -5,26 +5,42 @@ var child_process = require('child_process');
 var configFileBuilder = function(actBuilder) {
     var config = { urls: [] };
     var self = {};
+    var filename;
 
     self.withUrl = function(url) {
         config.urls.push(url);
         return self;
     }
 
+    self.withClientCert = function(path) {
+        config.client = config.client || {};
+        config.client.cert = path;
+        return self;
+    }
+
     self.build = function() {
-        var configFilename = Math.round(Math.random() * 100000) + '.json';
-        fs.writeFileSync(configFilename, JSON.stringify(config));
-        return configFilename;
+        filename = Math.round(Math.random() * 100000) + '.json';
+        fs.writeFileSync(filename, JSON.stringify(config));
+        return filename;
     }
 
     self.when = function() {
-        return actBuilder(self.build());
+        return actBuilder(self.build(), cleanup);
+    }
+
+    self.then = function(verify, done) {
+        verify(self.build());
+        cleanup(done);
+    };
+
+    var cleanup = function(callback) {
+        fs.unlink(filename, callback);
     }
 
     return self;
 }
 
-var actBuilder = function(configFilename, arrangeBuilder) {
+var actBuilder = function(configFilename, configCleanup) {
     var self = {};
 
     self.iRunTheApplication = function() {
@@ -32,7 +48,7 @@ var actBuilder = function(configFilename, arrangeBuilder) {
     }
 
     self.then = function(callback) {
-        return arrangeBuilder(callback, runApplication)
+        return runApplication(callback);
     }
 
     var runApplication = function(callback) {
@@ -52,7 +68,7 @@ var actBuilder = function(configFilename, arrangeBuilder) {
                 output += remainingOutput;
             }
 
-            fs.unlink(configFilename, function() {
+            configCleanup(function() {
                 callback(exitCode, output);
             });
         });
@@ -62,15 +78,9 @@ var actBuilder = function(configFilename, arrangeBuilder) {
 }
 
 module.exports.given = function() {
-    var createActBuilder = function(configFilename) {
-        return actBuilder(configFilename, function(assert, act) {
-            act(assert);
-        });
-    }
-
     return {
         aConfigFile: function() {
-          return configFileBuilder(createActBuilder);
+            return configFileBuilder(actBuilder);
         }
     }
 };
