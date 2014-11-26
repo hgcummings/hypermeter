@@ -26,8 +26,8 @@ describe('graph reporter', function() {
     it('creates/overwrites file if none specified', function(done) {
         var config = {
             filename: testFilename,
-            username: '$PLOTLY_USERNAME',
-            apiKey: '$PLOTLY_API_KEY',
+            username: process.env.PLOTLY_USERNAME,
+            apiKey: process.env.PLOTLY_API_KEY,
             build: 4
         };
         reporter = graphReporter.create(config);
@@ -56,8 +56,8 @@ describe('graph reporter', function() {
     it('creates plots for successful URLs', function(done) {
         var config = {
             filename: testFilename,
-            username: '$PLOTLY_USERNAME',
-            apiKey: '$PLOTLY_API_KEY',
+            username: process.env.PLOTLY_USERNAME,
+            apiKey: process.env.PLOTLY_API_KEY,
             build: 4,
             fileId: fileId
         };
@@ -92,8 +92,8 @@ describe('graph reporter', function() {
     it('extends an existing graph with new data', function(done) {
         var config = {
             filename: testFilename,
-            username: '$PLOTLY_USERNAME',
-            apiKey: '$PLOTLY_API_KEY',
+            username: process.env.PLOTLY_USERNAME,
+            apiKey: process.env.PLOTLY_API_KEY,
             build: 4,
             fileId: fileId
         };

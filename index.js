@@ -1,9 +1,7 @@
 #! /usr/bin/env node
 
-var fs = require('fs');
 var exit = require('exit');
 var log = require('loglevel');
-var config = require(fs.realpathSync(process.argv[2]));
 var client = require('./client.js');
 var reporters = require('./reporters');
 var checker = require('./checker.js');
@@ -14,6 +12,8 @@ if (process.env.LOG_LEVEL) {
 } else {
     log.setLevel(log.levels.WARN);
 }
+
+var config = require('./config.js').load(process.argv[2]);
 
 runner.run(
     client.create(config.client),

@@ -1,23 +1,10 @@
 var Q = require('q');
 var log = require('loglevel');
 
-var resolve = function resolve(value) {
-    if (value && value[0] === '$') {
-        return process.env[value.substr(1)];
-    } else {
-        return value;
-    }
-}
-
 exports.create = function(config) {
-    var username = resolve(config.username);
-    var apiKey = resolve(config.apiKey);
-    var build = resolve(config.build);
-    var fileId = resolve(config.fileId);
-    var filename = resolve(config.filename);
     var dataPoints = [];
 
-    var plotly = require('plotly')(username, apiKey);
+    var plotly = require('plotly')(config.username, config.apiKey);
     var plot = Q.nbind(plotly.plot, plotly);
 
     var plotTraces = function(existingTraces) {
@@ -50,7 +37,7 @@ exports.create = function(config) {
                 log.debug('Writing new traces...');
                 return plot(newTraces, {
                     layout: layout,
-                    filename: filename,
+                    filename: config.filename,
                     fileopt: existingTraces.length ? 'append' : 'overwrite'
                 });
             } else {
@@ -62,7 +49,7 @@ exports.create = function(config) {
             log.debug('Writing updated traces...');
             return plot(updatedTraces, {
                 layout: layout,
-                filename: filename,
+                filename: config.filename,
                 fileopt: 'extend',
                 traces: updatedTraceKeys
             }).then(function() {
@@ -74,7 +61,7 @@ exports.create = function(config) {
     }
 
     var createEmptyGraph = function() {
-        return plot({}, { filename: filename, fileopt: 'overwrite' })
+        return plot({}, { filename: config.filename, fileopt: 'overwrite' })
         .then(function(response) {
             log.warn('No fileId specified, created new graph ' + response.url);
             return plotTraces([]);
@@ -85,7 +72,7 @@ exports.create = function(config) {
         report: function(url, response, time, success) {
             if (success) {
                 dataPoints.push({
-                    x: build,
+                    x: config.build,
                     y: time,
                     name: url,
                     line: {shape: "spline"},
@@ -95,8 +82,8 @@ exports.create = function(config) {
         },
         summarise: function(passes, failures) {
             log.debug('Graph summarise...');
-            if (fileId) {
-                return Q.ninvoke(plotly, "getFigure", username, fileId)
+            if (config.fileId) {
+                return Q.ninvoke(plotly, "getFigure", config.username, config.fileId)
                 .then(function(figure) {
                     return figure.data.map(function(trace) { return trace.name; });
                 })
