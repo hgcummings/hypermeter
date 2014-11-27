@@ -72,7 +72,7 @@ A more advanced config file using the graph reporter might look like the followi
 }
 ```
 
-Note that the graph reporter config can include environment variables (prefixed by `$`).
+Note that config values can be environment variables (prefixed by `$`).
 
 If the graph reporter is used with no `fileId` specified, the filename will be
 created (or overwritten!) and the URL of the file will be output to the console.
