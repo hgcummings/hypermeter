@@ -2,6 +2,8 @@ var Q = require('q');
 
 exports.run = function(client, urls, reporter, checker) {
     var requests = [];
+    var passes = [];
+    var failures = [];
 
     urls.forEach(function(url) {
         var start = process.hrtime();
@@ -9,6 +11,11 @@ exports.run = function(client, urls, reporter, checker) {
             var elapsed = process.hrtime(start);
             var millis = elapsed[0] * 1e3 + Math.round(elapsed[1] / 1e6);
             var success = checker.check(url, response);
+            if (success) {
+                passes.push(url);
+            } else {
+                failures.push(url);
+            }
             reporter.report(url, response, millis, success);
         }, function(error) {
            console.log(error);
@@ -17,9 +24,9 @@ exports.run = function(client, urls, reporter, checker) {
 
     return Q.all(requests)
         .then(function() {
-            return reporter.summarise(checker.passes, checker.failures);
+            return reporter.summarise(passes, failures);
         })
         .then(function() {
-            return checker.failures;
+            return failures;
         });
 };

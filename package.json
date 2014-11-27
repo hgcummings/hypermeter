@@ -35,6 +35,7 @@
     "q-io": "^1.11.5"
   },
   "devDependencies": {
+    "cases": "^0.1.1",
     "mocha": "^2.0.1"
   }
 }

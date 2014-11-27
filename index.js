@@ -4,7 +4,7 @@ var log = require('loglevel');
 var runner = require('./runner.js');
 var client = require('./client.js');
 var reporters = require('./reporters');
-var checker = require('./checker.js');
+var checks = require('./checks');
 var exit = require('exit');
 
 if (process.env.LOG_LEVEL) {
@@ -19,7 +19,7 @@ require('./config.js').load(process.argv[2])
         client.create(config.client),
         config.urls,
         reporters.create(config.reporters),
-        checker.create(config.checker));
+        checks.create(config.checks));
 })
 .then(function(failedUrls) {
     exit(failedUrls.length);
