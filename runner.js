@@ -10,7 +10,7 @@ exports.run = function(client, urls, reporter, checker) {
         requests.push(client.request(url).then(function(response) {
             var elapsed = process.hrtime(start);
             var millis = elapsed[0] * 1e3 + Math.round(elapsed[1] / 1e6);
-            var success = checker.check(url, response);
+            var success = checker.check(url, response, millis);
             if (success) {
                 passes.push(url);
             } else {

@@ -36,6 +36,7 @@
   },
   "devDependencies": {
     "cases": "^0.1.1",
-    "mocha": "^2.0.1"
+    "mocha": "^2.0.1",
+    "sinon": "^1.12.1"
   }
 }
