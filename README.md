@@ -19,12 +19,17 @@ An array of URLs for hypermeter to measure
 
 ### reporters (optional)
 
-An object where each property name is the name of a reporter, and each property
-value is another object containing config specific to that reporter.
-The currently available reporters are 'console' and 'graph',
+An object containing reporter/config pairs. The currently available reporters
+are 'console' (which takes no further configuration options) and 'graph',
 which makes use of [plotly](https://plot.ly/) (see below).
 
 If no reporters are specified, a single console reporter is used by default.
+
+### checks (optional)
+
+An object containing check/config pairs. The currently available checks are
+'status' (which takes no further configuration options), and 'time', which takes
+an integer specifying the maximum allowable response time (in milliseconds).
 
 ### client (optional)
 
@@ -57,7 +62,7 @@ A more advanced config file using the graph reporter might look like the followi
         ...
     ],
     "reporters": {
-        "console": {},
+        "console": null,
         "graph": {
             "username": "my_plotly_username",
             "apiKey": "my_plotly_api_key",
@@ -66,6 +71,10 @@ A more advanced config file using the graph reporter might look like the followi
             "fileId": "56"
         }
     },
+    "checks": {
+        "status": null,
+        "time": 5000
+    }
     "client": {
         "cert": "/etc/pki/my_cert.pem"
     }

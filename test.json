@@ -3,5 +3,11 @@
         "https://twitter.com",
         "https://google.com",
         "https://facebook.com"
-    ]
+    ],
+    "checks": {
+        "time": "500"
+    },
+    "reporters": {
+        "console": null
+    }
 }
