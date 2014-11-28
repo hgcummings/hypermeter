@@ -1,3 +1,3 @@
 exports.create = function(config) {
-    return require('./responseCode.js').create();
+    return require('./status.js').create();
 }
