@@ -2,7 +2,7 @@ var timeCheck = require('../checks/time.js');
 var expect = require('chai').expect;
 var cases = require('cases');
 
-describe('check response code', function() {
+describe('check response time', function() {
     it('returns true for responses faster than or equal to the limit', cases([[0], [1], [2340], [5000]],
         function(time) {
             var checker = timeCheck.create(5000);
