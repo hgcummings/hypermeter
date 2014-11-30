@@ -2,31 +2,24 @@ var assert = require('assert');
 var Q = require('q');
 var plotly = require('plotly')(
     process.env.PLOTLY_USERNAME, process.env.PLOTLY_API_KEY);
-var graphReporter = require('../reporters/graph.js');
 var log = require('loglevel').setLevel('error');
+var proxyquire = require('proxyquire');
+var sinon = require('sinon');
 
 describe('graph reporter', function() {
     this.timeout(10000);
-    var fileId;
     var reporter;
-
-    beforeEach(function(done) {
-        var data = { };
-        var config = createConfig().build();
-        var opts = { filename: config.filename, fileopt: 'overwrite' };
-        Q.ninvoke(plotly, "plot", data, opts)
-        .then(function(msg) {
-            fileId = msg.url.split('/').pop();
-            done();
-        }).fail(function (error) {
-            console.log('Error ' + error);
-        }).done();
-    });
+    var filename = 'hypermeter_test';
 
     it('creates/overwrites file if none specified', function(done) {
         // Arrange
         var config = createConfig().build();
-        reporter = graphReporter.create(config);
+        var logWarn = sinon.spy();
+        reporter = proxyquire('../reporters/graph.js', {
+            'loglevel': {
+                warn: logWarn
+            }
+        }).create(config);
 
         // Act
         var url = 'http://test.example.com/';
@@ -34,57 +27,51 @@ describe('graph reporter', function() {
         var time = 123;
         var success = true;
         reporter.report(url, response, time, success);
-
         reporter.summarise([url], [])
+
         // Assert
-        .then(function() {
-            return Q.ninvoke(plotly, 'getFigure', process.env.PLOTLY_USERNAME, fileId);
-        })
+        .then(getFileIdFromWarningLog(logWarn))
+        .then(loadFile())
         .then(function(figure) {
             assert.equal(figure.data.length, 1);
             assert.equal(figure.data[0].x, config.build);
             assert.equal(figure.data[0].y, time);
-            done();
-        }).fail(function (error) {
-            console.log('Error ' + error);
-        }).done();
+        })
+        .then(done).done();
     });
 
     it('creates plots for successful URLs', function(done) {
-        // Arrange
-        var config = createConfig().withFileId().build();
-        reporter = graphReporter.create(config);
+        createFile({})
+        .then(function(fileId) {
+            // Arrange
+            var config = createConfig().withFileId(fileId).build();
+            reporter = require('../reporters/graph.js').create(config);
 
-        // Act
-        var url = 'http://test.example.com/';
-        var response = 200;
-        var time = 123;
-        var success = true;
-        reporter.report(url, response, time, success);
+            // Act
+            var url = 'http://test.example.com/';
+            var response = 200;
+            var time = 123;
+            var success = true;
+            reporter.report(url, response, time, success);
 
-        var failureUrl = 'http://failure.example.com';
-        reporter.report(failureUrl, 500, 45, false);
+            var failureUrl = 'http://failure.example.com';
+            reporter.report(failureUrl, 500, 45, false);
 
-        reporter.summarise([url], [failureUrl])
-        // Assert
-        .then(function() {
-            return Q.ninvoke(plotly, 'getFigure', process.env.PLOTLY_USERNAME, fileId);
+            return reporter.summarise([url], [failureUrl])
+            // Assert
+            .then(loadFile(fileId))
+            .then(function(figure) {
+                assert.equal(figure.data.length, 1);
+                assert.equal(figure.data[0].x, config.build);
+                assert.equal(figure.data[0].y, time);
+            });
         })
-        .then(function(figure) {
-            assert.equal(figure.data.length, 1);
-            assert.equal(figure.data[0].x, config.build);
-            assert.equal(figure.data[0].y, time);
-            done();
-        }).fail(function (error) {
-            console.log('Error ' + error);
-        }).done();
+        .then(done).done();
     });
 
 
     it('extends an existing graph with new data', function(done) {
         // Arrange
-        var config = createConfig().withFileId().build();
-
         var existingData = {
             x: 3,
             y: 100,
@@ -93,29 +80,24 @@ describe('graph reporter', function() {
             type: 'scatter'
         };
 
-        Q.ninvoke(plotly, "plot",
-            [existingData],
-            { filename: config.filename, fileopt: 'overwrite' })
-        .then(function() {
-            reporter = graphReporter.create(config);
+        createFile([existingData])
+        .then(function(fileId) {
+            var config = createConfig().withFileId(fileId).build();
+            reporter = require('../reporters/graph.js').create(config);
 
             // Act
             var url = 'http://test.example.com/';
             var response = 200;
             var time = 123;
             var success = true;
-
             reporter.report(url, response, time, success);
 
             var updatedTime = 234;
-
             reporter.report(existingData.name, 200, updatedTime, true);
 
-            return reporter.summarise([existingData.url, url], [])
+            return reporter.summarise([existingData.name, url], [])
             // Assert
-            .then(function() {
-                return Q.ninvoke(plotly, 'getFigure', process.env.PLOTLY_USERNAME, fileId);
-            })
+            .then(loadFile(fileId))
             .then(function(figure) {
                 var data = figure.data;
                 assert.equal(data.length, 2);
@@ -125,22 +107,18 @@ describe('graph reporter', function() {
                 assert.equal(data[1].y, time);
             });
         })
-        .then(done)
-        .fail(function (error) {
-            console.log('Error ' + error);
-        })
-        .done();
+        .then(done).done();
     });
 
     var createConfig = function() {
         var config = {
-            filename: 'hypermeter_test',
+            filename: filename,
             username: process.env.PLOTLY_USERNAME,
             apiKey: process.env.PLOTLY_API_KEY,
             build: 4
         };
         var self = {
-            withFileId: function() {
+            withFileId: function(fileId) {
                 config.fileId = fileId;
                 return self;
             },
@@ -150,5 +128,45 @@ describe('graph reporter', function() {
         };
 
         return self;
+    }
+
+    var createFile = function(data) {
+        return Q.ninvoke(plotly, "plot", data, { filename: filename, fileopt: 'overwrite' })
+        .then(function(msg) {
+            return msg.url.split('/').pop();
+        }).fail(function (error) {
+            console.log('Error ' + error);
+        });
+    }
+
+    var loadFile = function(fileId) {
+        var loadFileFromId = function(id) {
+            return Q.ninvoke(plotly, 'getFigure', process.env.PLOTLY_USERNAME, id);
+        }
+
+        if (fileId) {
+            return function() {
+                return loadFileFromId(fileId);
+            }
+        } else {
+            return function(deferredFileId) {
+                return loadFileFromId(deferredFileId);
+            }
+        }
+    }
+
+    var getFileIdFromWarningLog = function(logWarn) {
+        return function() {
+            var regex = /created new graph ([\S]+\/)([0-9]+)/i;
+            var fileId;
+            logWarn.args.forEach(function(args) {
+                var match = regex.exec(args[0]);
+                if (match) {
+                    fileId = match[2];
+                }
+            })
+            assert(fileId);
+            return fileId;
+        };
     }
 });

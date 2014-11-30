@@ -60,7 +60,7 @@ exports.create = function(config) {
         }
     }
 
-    var createEmptyGraph = function() {
+    var createNewGraph = function() {
         return plot({}, { filename: config.filename, fileopt: 'overwrite' })
         .then(function(response) {
             log.warn('No fileId specified, created new graph ' + response.url);
@@ -89,7 +89,7 @@ exports.create = function(config) {
                 })
                 .then(plotTraces);
             } else {
-                return createEmptyGraph();
+                return createNewGraph();
             }
         }
     };
