@@ -1,4 +1,3 @@
-var assert = require('assert');
 var helpers = require('./helpers.js');
 var given = require('./builder.js').given;
 var when = require('./builder.js').when;
@@ -33,7 +32,7 @@ describe('command line interface', function() {
             given().aConfigFile().withUrl('http://localhost:55557/200')
             .when().iRunTheApplication()
             .then(function(exitCode) {
-                assert.equal(0, exitCode);
+                expect(exitCode).to.equal(0);
                 done();
             });
         });
@@ -42,7 +41,7 @@ describe('command line interface', function() {
             given().aConfigFile().withUrl('http://localhost:55557/500')
             .when().iRunTheApplication()
             .then(function(exitCode) {
-                assert.equal(1, exitCode);
+                expect(exitCode).to.equal(1);
                 done();
             });
         });
@@ -53,7 +52,7 @@ describe('command line interface', function() {
                 .withUrl('http://localhost:55557/204')
             .when().iRunTheApplication()
             .then(function(exitCode) {
-                assert.equal(0, exitCode);
+                expect(exitCode).to.equal(0);
                 done();
             });
         });
@@ -66,7 +65,7 @@ describe('command line interface', function() {
                     .withUrl('http://localhost:55557/501')
             .when().iRunTheApplication()
             .then(function(exitCode) {
-                assert.equal(2, exitCode);
+                expect(exitCode).to.equal(2);
                 done();
             });
         });

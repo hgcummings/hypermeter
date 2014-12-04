@@ -1,4 +1,3 @@
-var assert = require('assert');
 var proxyquire = require('proxyquire');
 var sinon = require('sinon');
 var expect = require('chai').expect;
@@ -8,7 +7,7 @@ describe('check factory', function() {
     it('returns a default check if non specified', function() {
         var factory = require('../checks');
         var checker = factory.create();
-        assert(checker.check);
+        expect(checker.check).to.exist();
     });
 
     it('returns a checker containing the specified reporters', function() {
@@ -47,6 +46,6 @@ describe('check factory', function() {
             }
         });
 
-        assert.equal(actualConfig.foo, 'bar');
+        expect(actualConfig.foo).to.eq('bar');
     });
 });

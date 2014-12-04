@@ -1,4 +1,3 @@
-var assert = require('assert');
 var helpers = require('./helpers.js');
 var given = require('./builder.js').given;
 var config = require('../config.js');

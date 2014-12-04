@@ -1,12 +1,12 @@
-var assert = require('assert');
 var proxyquire = require('proxyquire');
+var expect = require('chai').expect;
 
 describe('reporter factory', function() {
 
     it('returns a default reporter if non specified', function() {
         var factory = require('../reporters');
         var reporter = factory.create();
-        assert(reporter.report);
+        expect(reporter.report).to.exist();
     });
 
     it('returns a reporter containing the specified reporters', function() {
@@ -23,7 +23,7 @@ describe('reporter factory', function() {
         var reporter = factory.create({ stubReporter: {} });
 
         reporter.report();
-        assert(called);
+        expect(called).to.be.true();
     });
 
     it('passes config to the specified reporters', function() {
@@ -41,6 +41,6 @@ describe('reporter factory', function() {
             }
         });
 
-        assert.equal(actualConfig.foo, 'bar');
+        expect(actualConfig.foo).to.equal('bar');
     });
 });
