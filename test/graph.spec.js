@@ -1,10 +1,10 @@
-var assert = require('assert');
 var Q = require('q');
 var log = require('loglevel').setLevel('error');
 var proxyquire = require('proxyquire');
 var sinon = require('sinon');
 var plotly = require('plotly');
 var conditionallyDescribe = describe;
+var expect = require('chai').expect;
 
 if (process.env.PLOTLY_USERNAME && process.env.PLOTLY_API_KEY) {
     plotly = plotly(process.env.PLOTLY_USERNAME, process.env.PLOTLY_API_KEY);
@@ -41,9 +41,9 @@ conditionallyDescribe('graph reporter', function() {
         .then(getFileIdFromWarningLog(logWarn))
         .then(loadFile())
         .then(function(figure) {
-            assert.equal(figure.data.length, 1);
-            assert.equal(figure.data[0].x, config.build);
-            assert.equal(figure.data[0].y, time);
+            expect(figure.data.length).to.equal(1);
+            expect(figure.data[0].x[0]).to.equal(config.build);
+            expect(figure.data[0].y[0]).to.equal(time);
         })
         .then(done).done();
     });
@@ -69,9 +69,9 @@ conditionallyDescribe('graph reporter', function() {
             // Assert
             .then(loadFile(fileId))
             .then(function(figure) {
-                assert.equal(figure.data.length, 1);
-                assert.equal(figure.data[0].x, config.build);
-                assert.equal(figure.data[0].y, time);
+                expect(figure.data.length).to.equal(1);
+                expect(figure.data[0].x[0]).to.equal(config.build);
+                expect(figure.data[0].y[0]).to.equal(time);
             });
         })
         .then(done).done();
@@ -108,11 +108,11 @@ conditionallyDescribe('graph reporter', function() {
             .then(loadFile(fileId))
             .then(function(figure) {
                 var data = figure.data;
-                assert.equal(data.length, 2);
-                assert.deepEqual(data[0].x, [existingData.x, config.build]);
-                assert.deepEqual(data[0].y, [existingData.y, updatedTime]);
-                assert.equal(data[1].x, config.build);
-                assert.equal(data[1].y, time);
+                expect(data.length).to.equal(2);
+                expect(data[0].x).to.eql([existingData.x, config.build]);
+                expect(data[0].y).to.eql([existingData.y, updatedTime]);
+                expect(data[1].x[0]).to.equal(config.build);
+                expect(data[1].y[0]).to.equal(time);
             });
         })
         .then(done).done();

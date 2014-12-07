@@ -1,6 +1,6 @@
-var assert = require('assert');
 var helpers = require('./helpers.js');
 var given = require('./builder.js').given;
+var expect = require('chai').use(require('chai-things')).expect;
 
 describe('console reporter', function() {
     var server;
@@ -25,9 +25,9 @@ describe('console reporter', function() {
             .iRunTheApplication()
         .then(function(exitCode, output) {
             var lines = output.split('\n');
-            assert(containsRegex(lines, /http:\/\/localhost:55557\/200 returned 200, took [0-9]+ milliseconds/));
-            assert(containsRegex(lines, /http:\/\/localhost:55557\/500 returned 500, took [0-9]+ milliseconds/));
-            assert(containsRegex(lines, /http:\/\/localhost:55557\/204 returned 204, took [0-9]+ milliseconds/));
+            expect(lines).include.one.to.match(/http:\/\/localhost:55557\/200 returned 200, took [0-9]+ milliseconds/);
+            expect(lines).include.one.to.match(/http:\/\/localhost:55557\/500 returned 500, took [0-9]+ milliseconds/);
+            expect(lines).include.one.to.match(/http:\/\/localhost:55557\/204 returned 204, took [0-9]+ milliseconds/);
             done();
         });
     });
@@ -41,9 +41,9 @@ describe('console reporter', function() {
             .iRunTheApplication()
         .then(function(exitCode, output) {
             var summaryLines = output.split('\n').slice(3);
-            assert.equal('Failed URLs:', summaryLines[0]);
-            assert(containsRegex(summaryLines, /http:\/\/localhost:55557\/500/));
-            assert(containsRegex(summaryLines, /http:\/\/localhost:55557\/503/));
+            expect(summaryLines[0]).to.eq('Failed URLs:');
+            expect(summaryLines).include.one.to.match(/http:\/\/localhost:55557\/500/);
+            expect(summaryLines).include.one.to.match(/http:\/\/localhost:55557\/503/);
             done();
         });
     });
@@ -56,17 +56,8 @@ describe('console reporter', function() {
             .iRunTheApplication()
         .then(function(exitCode, output) {
             var lines = output.split('\n');
-            assert.equal('', lines[2]);
+            expect(lines[2]).to.eq('');
             done();
         });
     });
-
-    var containsRegex = function(candidates, regex) {
-        for (var i = 0; i < candidates.length; ++i) {
-            if (regex.test(candidates[i])) {
-                return true;
-            }
-        }
-        return false;
-    }
 });

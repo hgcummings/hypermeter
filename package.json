@@ -36,6 +36,7 @@
   },
   "devDependencies": {
     "cases": "^0.1.1",
+    "chai-things": "^0.2.0",
     "grunt": "^0.4.5",
     "grunt-mocha-istanbul": "^2.2.0",
     "istanbul": "^0.3.2",
