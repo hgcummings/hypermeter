@@ -6,9 +6,7 @@ describe('check response code', function() {
     it('returns true for successful status codes', function() {
         var checker = statusCheck.create();
 
-        var result = checker.check('http://test.example.com/', {
-            status: 200
-        });
+        var result = checker.check('http://test.example.com/', { status: 200 });
 
         expect(result).to.be.true();
     });
@@ -17,9 +15,7 @@ describe('check response code', function() {
         function(code) {
             var checker = statusCheck.create();
 
-            var result = checker.check('http://test.example.com/', {
-                status: code
-            });
+            var result = checker.check('http://test.example.com/', { status: code });
 
             expect(result).to.be.false();
         })

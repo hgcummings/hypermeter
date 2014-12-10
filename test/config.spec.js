@@ -1,4 +1,3 @@
-var helpers = require('./helpers.js');
 var given = require('./builder.js').given;
 var config = require('../config.js');
 var expect = require('chai').expect;
@@ -30,12 +29,8 @@ describe('config', function() {
         .then(function(configFilename) {
             return config.load(configFilename).then(function(loaded) {
                 expect(loaded.urls.length).to.equal(3);
-            })
-            .then(done)
-            .fail(function (error) {
-                console.log('Error ' + error);
             });
-        });
+        }).then(done).done();;
     });
 
     it('parses environment variables', function(done) {
@@ -47,11 +42,7 @@ describe('config', function() {
         .then(function(configFilename) {
             return config.load(configFilename).then(function(loaded) {
                 expect(loaded.client.cert).to.equal(certPath);
-            })
-            .then(done)
-            .fail(function (error) {
-                console.log('Error ' + error);
             });
-        });
+        }).then(done).done();
     });
 });

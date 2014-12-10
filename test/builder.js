@@ -2,7 +2,7 @@ var fs = require('fs');
 var helpers = require('./helpers.js');
 var child_process = require('child_process');
 
-var configFileBuilder = function(actBuilder) {
+var arrangeBuilder = function(actBuilder) {
     var config = { urls: [] };
     var self = {};
     var filename;
@@ -29,7 +29,7 @@ var configFileBuilder = function(actBuilder) {
     }
 
     self.then = function(verify) {
-        verify(self.build()).then(cleanup).done();
+        return verify(self.build()).then(cleanup);
     };
 
     var cleanup = function(callback) {
@@ -89,7 +89,7 @@ var actBuilder = function(configFilename, configCleanup) {
 module.exports.given = function() {
     return {
         aConfigFile: function() {
-            return configFileBuilder(actBuilder);
+            return arrangeBuilder(actBuilder);
         }
     }
 };

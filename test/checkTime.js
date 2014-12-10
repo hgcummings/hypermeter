@@ -7,9 +7,7 @@ describe('check response time', function() {
         function(time) {
             var checker = timeCheck.create(5000);
 
-            var result = checker.check('http://test.example.com/', {
-                status: 200
-            }, time);
+            var result = checker.check('http://test.example.com/', { status: 200 }, time);
 
             expect(result).to.be.true();
         })
@@ -19,9 +17,7 @@ describe('check response time', function() {
         function(time) {
             var checker = timeCheck.create(5000);
 
-            var result = checker.check('http://test.example.com/', {
-                status: 200
-            }, time);
+            var result = checker.check('http://test.example.com/', { status: 200 }, time);
 
             expect(result).to.be.false();
         })
