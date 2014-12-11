@@ -1,21 +1,7 @@
-var helpers = require('./helpers.js');
 var given = require('./builder.js').given;
 var expect = require('chai').use(require('chai-things')).expect;
 
 describe('console reporter', function() {
-    var server;
-
-    before(function(done) {
-        server = helpers.startServer(function(req, res) {
-            res.statusCode = req.url.substring(1, 4);
-            res.end();
-        }, done);
-    });
-
-    after(function(done) {
-        server.close(done);
-    });
-
     it('lists URLs with status codes and response times', function(done) {
         given().aConfigFile()
             .withUrlThatReturnsStatus(200)

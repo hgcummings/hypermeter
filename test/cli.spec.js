@@ -1,4 +1,3 @@
-var helpers = require('./helpers.js');
 var given = require('./builder.js').given;
 var when = require('./builder.js').when;
 var expect = require('chai').expect;
@@ -14,22 +13,9 @@ describe('command line interface', function() {
     });
 
     describe('returnCode', function() {
-        var server;
-        var configFilename;
-
-        before(function(done) {
-            server = helpers.startServer(function(req, res) {
-                res.statusCode = req.url.substring(1, 4);
-                res.end();
-            }, done);
-        });
-
-        after(function(done) {
-            server.close(done);
-        });
-
         it('should be 0 if only URL returns good responses', function(done) {
-            given().aConfigFile().withUrlThatReturnsStatus(200)
+            given()
+                .aConfigFile().withUrlThatReturnsStatus(200)
             .when().iRunTheApplication()
             .then(function(config, exitCode) {
                 expect(exitCode).to.equal(0);
@@ -38,7 +24,8 @@ describe('command line interface', function() {
         });
 
         it('should be 1 if only URL returns a bad response', function(done) {
-            given().aConfigFile().withUrlThatReturnsStatus(500)
+            given()
+                .aConfigFile().withUrlThatReturnsStatus(500)
             .when().iRunTheApplication()
             .then(function(config, exitCode) {
                 expect(exitCode).to.equal(1);
@@ -47,7 +34,8 @@ describe('command line interface', function() {
         });
 
         it('should be 0 if all URLs return good responses', function(done) {
-            given().aConfigFile()
+            given()
+                .aConfigFile()
                 .withUrlThatReturnsStatus(200)
                 .withUrlThatReturnsStatus(204)
             .when().iRunTheApplication()
@@ -60,9 +48,9 @@ describe('command line interface', function() {
         it('should be the number of failures if some URLs fail', function(done) {
             given()
                 .aConfigFile()
-                    .withUrlThatReturnsStatus(200)
-                    .withUrlThatReturnsStatus(500)
-                    .withUrlThatReturnsStatus(501)
+                .withUrlThatReturnsStatus(200)
+                .withUrlThatReturnsStatus(500)
+                .withUrlThatReturnsStatus(501)
             .when().iRunTheApplication()
             .then(function(config, exitCode) {
                 expect(exitCode).to.equal(2);

@@ -1,12 +1,20 @@
 var fs = require('fs');
-var helpers = require('./helpers.js');
 var child_process = require('child_process');
 var Q = require('q');
+var http = require('http');
+
+var SERVER_PORT = 55557;
+
+var randomInt = function() {
+    return Math.round(Math.random() * 100000);
+}
 
 var arrangeBuilder = function(actBuilder) {
     var config = { urls: [] };
     var self = {};
     var filename;
+    var server;
+    var responses = {};
 
     self.withUrl = function(url) {
         config.urls.push(url);
@@ -14,7 +22,9 @@ var arrangeBuilder = function(actBuilder) {
     }
 
     self.withUrlThatReturnsStatus = function(status) {
-        config.urls.push('http://localhost:55557/' + status);
+        var path = randomInt();
+        config.urls.push('http://localhost:' + SERVER_PORT + '/' + path);
+        responses[path] = status;
         return self;
     }
 
@@ -25,9 +35,17 @@ var arrangeBuilder = function(actBuilder) {
     }
 
     var setup = function() {
-        filename = Math.round(Math.random() * 100000) + '.json';
+        filename = randomInt() + '.json';
         fs.writeFileSync(filename, JSON.stringify(config));
-        return Q(filename);
+        server = http.createServer(function(req, res) {
+            res.statusCode = responses[req.url.substring(1)];
+            res.end();
+        });
+
+        return Q.ninvoke(server, 'listen', SERVER_PORT, 'localhost', 8)
+        .then(function() {
+            return filename;
+        });
     }
 
     self.when = function() {
@@ -39,7 +57,7 @@ var arrangeBuilder = function(actBuilder) {
     };
 
     var cleanup = function(callback) {
-        fs.unlink(filename, callback);
+        return Q.all([Q.nfcall(fs.unlink, filename), Q.ninvoke(server, 'close')]).then(callback).done();
     }
 
     return self;

@@ -173,7 +173,7 @@ conditionallyDescribe('graph reporter', function() {
                     fileId = match[2];
                 }
             })
-            assert(fileId);
+            expect(fileId).to.be.ok();
             return fileId;
         };
     }
