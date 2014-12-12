@@ -1,5 +1,6 @@
-var proxyquire = require('proxyquire');
+var proxyquire = require('proxyquire').noCallThru();
 var expect = require('chai').expect;
+var sinon = require('sinon');
 
 describe('reporter factory', function() {
 
@@ -10,37 +11,38 @@ describe('reporter factory', function() {
     });
 
     it('returns a reporter containing the specified reporters', function() {
-        var called = false;
-
+        // Arrange
+        var report = sinon.spy();
         var factory = proxyquire('../reporters', {
-            './stubReporter.js': {
+            './mock.js': {
                 create: function() { return {
-                    report: function() { called = true; },
-                }},
-                '@noCallThru': true
+                    report: report,
+                }}
             }
         });
-        var reporter = factory.create({ stubReporter: {} });
 
-        reporter.report();
-        expect(called).to.be.true();
+        // Act
+        var reporter = factory.create({ mock: {} });
+        var url = 'http://test.example.com', response = { status: 200 }, time = 132, success = true;
+        reporter.report(url, response, time, success);
+
+        // Assert
+        expect(report.calledWith(url, response, time, success)).to.be.true();
     });
 
     it('passes config to the specified reporters', function() {
+        // Arrange
         var actualConfig = null;
-
         var factory = proxyquire('../reporters', {
-            './stubReporter.js': {
-                create: function(config) { actualConfig = config; },
-                '@noCallThru': true
-            }
-        });
-        var reporter = factory.create({
-            stubReporter: {
-                foo: 'bar'
+            './mock.js': {
+                create: function(config) { actualConfig = config; }
             }
         });
 
+        // Act
+        var reporter = factory.create({ mock: { foo: 'bar' } });
+
+        // Assert
         expect(actualConfig.foo).to.equal('bar');
     });
 });

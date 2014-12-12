@@ -1,4 +1,4 @@
-var proxyquire = require('proxyquire');
+var proxyquire = require('proxyquire').noCallThru();
 var sinon = require('sinon');
 var expect = require('chai').expect;
 
@@ -10,21 +10,19 @@ describe('check factory', function() {
     });
 
     it('returns a checker containing the specified reporters', function() {
+        // Arrange
         var check = sinon.spy();
         var factory = proxyquire('../checks', {
             './mock.js': {
                 create: function() { return {
                     check: check,
-                }},
-                '@noCallThru': true
+                }}
             }
         });
-        var url = 'http://test.example.com';
-        var response = { status: 200 };
-        var time = 132;
 
         // Act
         var checker = factory.create({ mock: {} });
+        var url = 'http://test.example.com', response = { status: 200 }, time = 132;
         checker.check(url, response, time);
 
         // Assert
@@ -36,8 +34,7 @@ describe('check factory', function() {
         var actualConfig = null;
         var factory = proxyquire('../checks', {
             './mock.js': {
-                create: function(config) { actualConfig = config; },
-                '@noCallThru': true
+                create: function(config) { actualConfig = config; }
             }
         });
 
