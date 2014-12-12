@@ -23,9 +23,9 @@ describe('config', function() {
 
     it('reads all urls from file', function(done) {
         given().aConfigFile()
-            .withUrl('http://localhost:55557/one')
-            .withUrl('http://localhost:55557/two')
-            .withUrl('http://localhost:55557/three')
+            .withUrl('http://test.example.com/one')
+            .withUrl('http://test.example.com/two')
+            .withUrl('http://test.example.com/three')
         .then(function(configFilename) {
             return config.load(configFilename).then(function(loaded) {
                 expect(loaded.urls.length).to.equal(3);
