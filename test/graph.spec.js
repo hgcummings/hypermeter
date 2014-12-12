@@ -1,12 +1,20 @@
 var assert = require('assert');
 var Q = require('q');
-var plotly = require('plotly')(
-    process.env.PLOTLY_USERNAME, process.env.PLOTLY_API_KEY);
 var log = require('loglevel').setLevel('error');
 var proxyquire = require('proxyquire');
 var sinon = require('sinon');
+var plotly = require('plotly');
+var conditionallyDescribe = describe;
 
-describe('graph reporter', function() {
+if (process.env.PLOTLY_USERNAME && process.env.PLOTLY_API_KEY) {
+    plotly = plotly(process.env.PLOTLY_USERNAME, process.env.PLOTLY_API_KEY);
+}
+else {
+    console.log('Graph tests require PLOTLY_USERNAME and PLOTLY_API_KEY environment variables.');
+    conditionallyDescribe = describe.skip;
+}
+
+conditionallyDescribe('graph reporter', function() {
     this.timeout(10000);
     var reporter;
     var filename = 'hypermeter_test';
