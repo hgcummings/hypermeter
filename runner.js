@@ -1,4 +1,6 @@
 var Q = require('q');
+var allWithDescendants = require('./extensions/q.js').allWithDescendants;
+var getHeader = require('./extensions/http.js').getHeader;
 
 exports.run = function(client, urls, reporter, checker) {
     var requests = [];
@@ -7,14 +9,14 @@ exports.run = function(client, urls, reporter, checker) {
     var request = function(url) {
         var start = process.hrtime();
         return client.request(url).then(function(response) {
-            var elapsed = process.hrtime(start);
-
-            if (response.status == 302 && response.headers['Location']) {
+            var elapsed = process.hrtime(start),
+                millis = elapsed[0] * 1e3 + Math.round(elapsed[1] / 1e6),
+                success;
+            if (response.status == 302 && getHeader(response, 'Location')) {
                 reporter.report(url, response, millis, success);
-                return request(response.headers['Location']);
+                return request(getHeader(response, 'Location'));
             } else {
-                var millis = elapsed[0] * 1e3 + Math.round(elapsed[1] / 1e6);
-                var success = checker.check(url, response, millis);
+                success = checker.check(url, response, millis);
                 if (success) {
                     passes.push(url);
                 } else {
@@ -32,7 +34,7 @@ exports.run = function(client, urls, reporter, checker) {
         requests.push(request(url));
     });
 
-    return Q.all(requests)
+    return allWithDescendants(requests)
         .then(function() {
             return reporter.summarise(passes, failures);
         })
