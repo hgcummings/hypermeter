@@ -14,7 +14,7 @@ exports.create = function(config) {
             }
             extend(options, config);
             return Q.nfcall(curl.request, options).then(function(curlOutput) {
-                var stdout = curlOutput[0];
+                var stdout = curlOutput[curlOutput.length-1];
                 return {
                     status: stdout.substr(stdout.lastIndexOf('#') + 1)
                 }
