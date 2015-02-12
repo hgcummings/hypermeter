@@ -9,7 +9,7 @@ var randomInt = function() {
     return Math.round(Math.random() * 100000);
 }
 
-var arrangeBuilder = function(actBuilder) {
+var arrangeBuilder = function(actBuilder, writeFile) {
     var config = { urls: [] };
     var self = {};
     var filename;
@@ -24,7 +24,19 @@ var arrangeBuilder = function(actBuilder) {
     self.withUrlThatReturnsStatus = function(status) {
         var path = randomInt();
         config.urls.push('http://localhost:' + SERVER_PORT + '/' + path);
-        responses[path] = status;
+        responses[path] = function(response) {
+            response.statusCode = status;
+        };
+        return self;
+    }
+
+    self.withUrlThatReturnsHeader = function(name, value) {
+        var path = randomInt();
+        config.urls.push('http://localhost:' + SERVER_PORT + '/' + path);
+        responses[path] = function(response) {
+            response.statusCode = 200;
+            response.setHeader(name, value);
+        };
         return self;
     }
 
@@ -35,16 +47,18 @@ var arrangeBuilder = function(actBuilder) {
     }
 
     var setup = function() {
-        filename = randomInt() + '.json';
-        fs.writeFileSync(filename, JSON.stringify(config));
+        if (writeFile) {
+            filename = randomInt() + '.json';
+            fs.writeFileSync(filename, JSON.stringify(config));
+        }
         server = http.createServer(function(req, res) {
-            res.statusCode = responses[req.url.substring(1)];
+            responses[req.url.substring(1)](res);
             res.end();
         });
 
         return Q.ninvoke(server, 'listen', SERVER_PORT, 'localhost', 8)
         .then(function() {
-            return filename;
+            return writeFile ? filename : config;
         });
     }
 
@@ -57,7 +71,12 @@ var arrangeBuilder = function(actBuilder) {
     };
 
     var cleanup = function(callback) {
-        return Q.all([Q.nfcall(fs.unlink, filename), Q.ninvoke(server, 'close')]).then(callback).done();
+        var cleanups = [Q.ninvoke(server, 'close')];
+        if (writeFile) {
+            cleanups.push(Q.nfcall(fs.unlink, filename));
+        }
+
+        return Q.all(cleanups).then(callback).done();
     }
 
     return self;
@@ -67,11 +86,11 @@ var actBuilder = function(configSetup, configCleanup, config) {
     var self = {};
 
     self.iRunTheApplication = function() {
-        return self;
-    }
-
-    self.then = function(callback) {
-        return runApplication(callback);
+        return {
+            then: function(callback) {
+                return runApplication(callback);
+            }
+        }
     }
 
     var runApplication = function(callback) {
@@ -115,7 +134,10 @@ var actBuilder = function(configSetup, configCleanup, config) {
 module.exports.given = function() {
     return {
         aConfigFile: function() {
-            return arrangeBuilder(actBuilder);
+            return arrangeBuilder(actBuilder, true);
+        },
+        aConfig: function() {
+            return arrangeBuilder()
         }
     }
 };

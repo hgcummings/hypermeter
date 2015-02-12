@@ -1,28 +1,40 @@
 var Q = require('q');
+var allWithDescendants = require('./extensions/q.js').allWithDescendants;
+var getHeader = require('./extensions/http.js').getHeader;
 
 exports.run = function(client, urls, reporter, checker) {
     var requests = [];
     var passes = [];
     var failures = [];
-
-    urls.forEach(function(url) {
+    var request = function(url) {
         var start = process.hrtime();
-        requests.push(client.request(url).then(function(response) {
-            var elapsed = process.hrtime(start);
-            var millis = elapsed[0] * 1e3 + Math.round(elapsed[1] / 1e6);
-            var success = checker.check(url, response, millis);
-            if (success) {
-                passes.push(url);
+        return client.request(url).then(function(response) {
+            var elapsed = process.hrtime(start),
+                millis = elapsed[0] * 1e3 + Math.round(elapsed[1] / 1e6),
+                success;
+            if (response.status == 302 && getHeader(response, 'Location')) {
+                reporter.report(url, response, millis, success);
+                return request(getHeader(response, 'Location'));
             } else {
-                failures.push(url);
+                success = checker.check(url, response, millis);
+                if (success) {
+                    passes.push(url);
+                } else {
+                    failures.push(url);
+                }
+                reporter.report(url, response, millis, success);
+                return Q('Done');
             }
-            reporter.report(url, response, millis, success);
         }, function(error) {
            console.log(error);
-        }));
+        })
+    };
+
+    urls.forEach(function(url) {
+        requests.push(request(url));
     });
 
-    return Q.all(requests)
+    return allWithDescendants(requests)
         .then(function() {
             return reporter.summarise(passes, failures);
         })
