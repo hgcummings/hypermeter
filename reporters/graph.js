@@ -24,7 +24,7 @@ exports.create = function(config) {
 
         var layout = {
             xaxis: {
-                type: 'category',
+                type: 'linear',
                 title: 'Build'
             },
             yaxis: {
