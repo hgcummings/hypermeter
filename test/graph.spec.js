@@ -3,9 +3,9 @@ var log = require('loglevel').setLevel('error');
 var proxyquire = require('proxyquire');
 var sinon = require('sinon');
 var plotly = require('plotly');
-var conditionallyDescribe = describe;
 var expect = require('chai').expect;
 
+var conditionallyDescribe = describe;
 if (process.env.PLOTLY_USERNAME && process.env.PLOTLY_API_KEY) {
     plotly = plotly(process.env.PLOTLY_USERNAME, process.env.PLOTLY_API_KEY);
 }

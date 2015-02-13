@@ -1,13 +1,18 @@
 {
     "urls": [
         "https://twitter.com",
-        "https://google.com",
         "https://facebook.com"
     ],
     "checks": {
-        "time": "500"
+        "time": "5000"
     },
     "reporters": {
-        "console": null
+        "console": null,
+        "json": {
+            "filename": "chart.json",
+            "plotListKey": "datasets",
+            "plotNameKey": "label",
+            "build": "5"
+        }
     }
 }

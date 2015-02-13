@@ -2,12 +2,9 @@ var fs = require('fs');
 var child_process = require('child_process');
 var Q = require('q');
 var http = require('http');
+var randomInt = require('./utils.js').randomInt;
 
 var SERVER_PORT = 55557;
-
-var randomInt = function() {
-    return Math.round(Math.random() * 100000);
-}
 
 var arrangeBuilder = function(actBuilder, writeFile) {
     var config = { urls: [] };
