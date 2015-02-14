@@ -20,8 +20,10 @@ An array of URLs for hypermeter to measure
 ### reporters (optional)
 
 An object containing reporter/config pairs. The currently available reporters
-are 'console' (which takes no further configuration options) and 'graph',
-which makes use of [plotly](https://plot.ly/) (see below).
+are:
+* 'console' (which takes no further configuration options) 
+* 'json', which creates/updates a JSON file that can be used to draw graphs ([see the wiki](https://github.com/hgcummings/hypermeter/wiki/Using-the-JSON-reporter-to-generate-graphs))
+* 'graph', which makes use of [plotly](https://plot.ly/) (see below)
 
 If no reporters are specified, a single console reporter is used by default.
 
