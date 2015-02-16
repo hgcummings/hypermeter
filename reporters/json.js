@@ -19,25 +19,23 @@ exports.create = function(config) {
             .then(function(data) {
                 var output = JSON.parse(data);
                 results.forEach(function(result) {
-                    var found = false;
-                    output[config.plotListKey].every(function(plot) {
-                        if (plot[config.plotNameKey] === result.url) {
-                            found = true;
-                            plot.data.push(result.time);
+                    var plot;
+                    output[config.plotListKey].every(function(existingPlot) {
+                        if (existingPlot[config.plotNameKey] === result.url) {
+                            plot = existingPlot;
                             return false;
                         }
                         return true;
                     });
-                    if (!found) {
-                        var plot = { data: [] };
+                    if (!plot) {
+                        plot = { data: [] };
                         plot[config.plotNameKey] = result.url;
-                        plot.data = [];
-                        output.labels.forEach(function() {
-                            plot.data.push(null);
-                        })
-                        plot.data.push(result.time);
                         output[config.plotListKey].push(plot);
                     }
+                    while(plot.data.length < output.labels.length) {
+                        plot.data.push(null);
+                    }
+                    plot.data.push(result.time);
                 });
                 output.labels.push(config.build);
                 return output;
