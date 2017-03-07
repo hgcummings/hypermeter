@@ -26,7 +26,8 @@ exports.run = function(client, urls, reporter, checker) {
                 return Q('Done');
             }
         }, function(error) {
-           console.log(error);
+           console.log(url + ': ' + error);
+           failures.push(url);
         })
     };
 
