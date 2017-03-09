@@ -45,5 +45,33 @@ describe('runner', function() {
             assert(!checker.check.calledWith(redirectFrom));
             assert(checker.check.calledWith(redirectTo));
         }).then(done).done();
-    }))
+    }));
+
+    it('returns a failed request as a failure', function(done) {
+        // Arrange
+        var client = {
+            request: sinon.stub()
+        };
+        var failingUrl = 'https://test.example.com/failsRequest';
+
+        var urls = [failingUrl];
+        var reporter = {
+            report: sinon.spy(),
+            summarise: sinon.spy()
+        };
+        var checker = { check: sinon.spy() };
+        var runner = require('../runner.js');
+
+        client.request.withArgs(failingUrl).returns(
+            Q.fcall(function() {
+                throw 'Request failure error message';
+            })
+        );
+
+        // Act
+        runner.run(client, urls, reporter, checker).then(function() {
+            // Assert
+            assert(reporter.summarise.calledWith([], [failingUrl]));
+        }).then(done).done();
+    });
 })
